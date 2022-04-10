@@ -52,3 +52,11 @@ class MoreNet(nn.Module):
             return x.detach(), F.softmax(y)
         else:
             return F.softmax(y)
+
+
+def init_weights(net):
+    def init(m):
+        if type(m) == nn.Linear or type(m) == nn.Conv2d:
+            nn.init.xavier_uniform_(m.weight)
+
+    net.apply(init)

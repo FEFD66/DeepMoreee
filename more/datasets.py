@@ -36,3 +36,6 @@ class ModulationDataSets(Dataset):
 
     def get_labels_name(self):
         return self.labels
+
+    def get_numclasses(self):
+        return len(self.labels)
