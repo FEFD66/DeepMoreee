@@ -3,7 +3,7 @@ import os.path as osp
 import os
 
 
-def plot_features(features, labels, num_classes, epoch, prefix, legend=None):
+def plot_features(features, labels, num_classes, epoch, prefix, legends=None):
     """Plot features on 2D plane.
 
     Args:
@@ -18,13 +18,13 @@ def plot_features(features, labels, num_classes, epoch, prefix, legend=None):
             c=colors[label_idx],
             s=1,
         )
-    if legend is None:
+    if legends is None:
         plt.legend(['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'], loc='upper right')
     else:
-        plt.legend(legend, loc='upper right')
+        plt.legend(legends, loc='upper right')
     dirname = osp.join("E:/pic", prefix)
     if not osp.exists(dirname):
         os.mkdir(dirname)
-    save_name = osp.join(dirname, 'epoch_' + str(epoch + 1) + '.png')
+    save_name = osp.join(dirname, 'epoch_{:03}.png'.format(epoch+1))
     plt.savefig(save_name, bbox_inches='tight')
     plt.close()
