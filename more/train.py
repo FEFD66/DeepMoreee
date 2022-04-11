@@ -52,4 +52,4 @@ def train_center(model, criterion_xent, criterion_cent,
     # end of batch loop
     all_features = np.concatenate(all_features, 0)
     all_labels = np.concatenate(all_labels, 0)
-    plot_features(all_features, all_labels, num_classes, epoch, prefix='more',legends=trainloader.dataset.get_labels_name())
+    plot_features(all_features, all_labels, num_classes, epoch, prefix='more-new',legends=trainloader.dataset.get_labels_name())
