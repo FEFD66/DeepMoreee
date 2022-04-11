@@ -2,7 +2,7 @@ import torch.nn.functional as F
 import torch.nn as nn
 
 
-def old_net():
+def old_conv():
     return nn.Sequential(
         nn.Conv2d(1, 10, kernel_size=5), nn.MaxPool2d(2), nn.ReLU(),
         nn.Conv2d(10, 20, kernel_size=5), nn.Dropout2d(0.2), nn.MaxPool2d(2), nn.ReLU(),
@@ -10,19 +10,10 @@ def old_net():
         nn.Linear(11960, 4096), nn.ReLU(),
         nn.Linear(4096, 50), nn.ReLU(),
         nn.Dropout(0),
-        nn.Linear(50, 8),
-        nn.Softmax()
+        nn.Linear(50, 2)
     )
-
-
-def new_net():
-    return MoreNet()
-
-
-class MoreNet(nn.Module):
-    def __init__(self):
-        super().__init__()
-        self.conv = nn.Sequential(
+def new_conv():
+    return nn.Sequential(
             nn.Conv2d(1, 32, kernel_size=5, stride=1, padding=2),
             nn.PReLU(),
             nn.Conv2d(32, 32, kernel_size=5, stride=1, padding=2),
@@ -41,7 +32,17 @@ class MoreNet(nn.Module):
             nn.PReLU(),
             nn.MaxPool2d(2),
             nn.Flatten(),
-            nn.Linear(24576, 2))
+            nn.Linear(24576, 4096), nn.ReLU(),
+            nn.Linear(4096, 2), nn.ReLU())
+
+def new_net():
+    return MoreNet()
+
+
+class MoreNet(nn.Module):
+    def __init__(self):
+        super().__init__()
+        self.conv = new_conv()
 
         self.fc8 = nn.Linear(2, 8)
 
