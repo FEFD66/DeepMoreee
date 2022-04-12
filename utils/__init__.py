@@ -1,7 +1,6 @@
-
-
 def get_out_path():
-    return "E:/pic"
+    return "E:/more"
+
 
 class AverageMeter(object):
     """Computes and stores the average and current value.

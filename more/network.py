@@ -42,7 +42,7 @@ def new_net():
 class MoreNet(nn.Module):
     def __init__(self):
         super().__init__()
-        self.conv = new_conv()
+        self.conv = old_conv()
 
         self.fc8 = nn.Linear(2, 8)
 

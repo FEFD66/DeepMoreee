@@ -1,7 +1,9 @@
 import h5py
 import torch
+import torchvision
 from torch.utils.data import Dataset
-from torchvision.transforms import ToTensor
+from torch.utils.data import DataLoader
+from torchvision.transforms import ToTensor, transforms
 
 
 class ModulationDataSets(Dataset):
@@ -39,3 +41,32 @@ class ModulationDataSets(Dataset):
 
     def get_numclasses(self):
         return len(self.labels)
+
+
+def load_more_data(path: str, batch_size: int = 64) -> (DataLoader, DataLoader):
+    train_path = path + '/train.h5'
+    test_path = path + '/test.h5'
+    train_dataset = ModulationDataSets(train_path)
+    test_dataset = ModulationDataSets(test_path)
+    train_loader = DataLoader(
+        dataset=train_dataset, batch_size=batch_size, shuffle=True,
+        num_workers=0, drop_last=False)
+    test_loader = DataLoader(
+        dataset=test_dataset, batch_size=batch_size, shuffle=True,
+        num_workers=0, drop_last=False)
+    return train_loader, test_loader
+
+
+def load_data_mnist(batch_size, resize=None):
+    trans = [transforms.ToTensor()]
+    if resize:
+        trans.insert(0, transforms.Resize(resize))
+    trans = transforms.Compose(trans)
+    mnist_train = torchvision.datasets.MNIST(
+        root="./data", train=True, transform=trans, download=True)
+    mnist_test = torchvision.datasets.MNIST(
+        root="./data", train=False, transform=trans, download=True)
+    return (torch.utils.data.DataLoader(mnist_train, batch_size, shuffle=True,
+                                        num_workers=0),
+            torch.utils.data.DataLoader(mnist_test, batch_size, shuffle=False,
+                                        num_workers=0))

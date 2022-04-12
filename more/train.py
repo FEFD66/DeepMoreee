@@ -1,13 +1,44 @@
+import torch.cuda
+
 from utils import AverageMeter
 from utils.plot import plot_features
 import numpy as np
+
+
+def train(net, criterion, optimizer, trainloader, epoch=None, **options):
+    net.train()
+    losses = AverageMeter()
+    torch.cuda.empty_cache()
+
+    loss_all = 0
+    for batch_idx, (data, labels) in enumerate(trainloader):
+        if options['use_gpu']:
+            data, labels = data.cuda(), labels.cuda()
+
+        with torch.set_grad_enabled(True):
+            optimizer.zero_grad()
+            x, y = net(data, True)
+            logits, loss = criterion(x, y, labels)
+
+            loss.backward()
+            optimizer.step()
+
+        losses.update(loss.item(), labels.size(0))
+
+        if (batch_idx + 1) % options['print_freq'] == 0:
+            print("Batch {}/{}\t Loss {:.6f} ({:.6f})" \
+                  .format(batch_idx + 1, len(trainloader), losses.val, losses.avg))
+
+        loss_all += losses.avg
+
+    return loss_all
 
 
 def train_center(model, criterion_xent, criterion_cent,
                  optimizer_model, optimizer_centloss,
                  trainloader, use_gpu, num_classes, epoch):
     weight_cent = 1
-    print_freq=50
+    print_freq = 50
 
     model.train()
     xent_losses = AverageMeter()
@@ -19,7 +50,7 @@ def train_center(model, criterion_xent, criterion_cent,
     for batch_idx, (data, labels) in enumerate(trainloader):
         if use_gpu:
             data, labels = data.cuda(), labels.cuda()
-        features, outputs = model(data,True)
+        features, outputs = model(data, True)
         loss_xent = criterion_xent(outputs, labels)
         loss_cent = criterion_cent(features, labels)
         loss_cent *= weight_cent
@@ -37,7 +68,6 @@ def train_center(model, criterion_xent, criterion_cent,
         xent_losses.update(loss_xent.item(), labels.size(0))
         cent_losses.update(loss_cent.item(), labels.size(0))
 
-
         if use_gpu:
             all_features.append(features.data.cpu().numpy())
             all_labels.append(labels.data.cpu().numpy())
@@ -52,4 +82,5 @@ def train_center(model, criterion_xent, criterion_cent,
     # end of batch loop
     all_features = np.concatenate(all_features, 0)
     all_labels = np.concatenate(all_labels, 0)
-    plot_features(all_features, all_labels, num_classes, epoch, prefix='more-new',legends=trainloader.dataset.get_labels_name())
+    plot_features(all_features, all_labels, num_classes, epoch, prefix='more-new',
+                  legends=trainloader.dataset.get_labels_name())
