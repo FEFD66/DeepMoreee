@@ -9,7 +9,7 @@ from core import train, test
 from datasets.osr_dataloader import MNIST_OSR
 from models import gan
 from models.models import classifier32
-from utils import save_networks, load_networks
+from osr.utils import save_networks, load_networks
 
 #%%
 seed = 0
@@ -30,20 +30,20 @@ net = classifier32(num_classes=Data.num_classes)
 net=nn.DataParallel(net).cuda()
 #%%
 # GAN
-nz,ns=100,1
-netG = gan.Generator32(1, nz, 64, 3)
-netD = gan.Discriminator32(1, 3, 64)
-fixed_noise = torch.FloatTensor(64, nz, 1, 1).normal_(0, 1)
-
-netG = nn.DataParallel(netG).cuda()
-netD = nn.DataParallel(netD).cuda()
-fixed_noise.cuda()
+# nz,ns=100,1
+# netG = gan.Generator32(1, nz, 64, 3)
+# netD = gan.Discriminator32(1, 3, 64)
+# fixed_noise = torch.FloatTensor(64, nz, 1, 1).normal_(0, 1)
+#
+# netG = nn.DataParallel(netG).cuda()
+# netD = nn.DataParallel(netD).cuda()
+# fixed_noise.cuda()
 #%%
 import loss.ARPLoss as Loss
 criterion = Loss.ARPLoss(num_classes=Data.num_classes)
 criterion=criterion.cuda()
 
-criterionD = nn.BCELoss()
+# criterionD = nn.BCELoss()
 #%%
 
 #%%
@@ -63,8 +63,8 @@ params_list = [{'params': net.parameters()},
                 {'params': criterion.parameters()}]
 optimizer = torch.optim.SGD(params_list, lr, momentum=0.9, weight_decay=1e-4)
 # GAN
-optimizerD = torch.optim.Adam(netD.parameters(), lr=gan_lr, betas=(0.5, 0.999))
-optimizerG = torch.optim.Adam(netG.parameters(), lr=gan_lr, betas=(0.5, 0.999))
+# optimizerD = torch.optim.Adam(netD.parameters(), lr=gan_lr, betas=(0.5, 0.999))
+# optimizerG = torch.optim.Adam(netG.parameters(), lr=gan_lr, betas=(0.5, 0.999))
 
 scheduler = lr_scheduler.MultiStepLR(optimizer, milestones=[30,60,90,120])
 #%%

@@ -11,6 +11,7 @@ def train(net, criterion, optimizer, trainloader, epoch=None, **options):
     torch.cuda.empty_cache()
 
     loss_all = 0
+    all_features, all_labels = [], []
     for batch_idx, (data, labels) in enumerate(trainloader):
         if options['use_gpu']:
             data, labels = data.cuda(), labels.cuda()
@@ -19,6 +20,13 @@ def train(net, criterion, optimizer, trainloader, epoch=None, **options):
             optimizer.zero_grad()
             x, y = net(data, True)
             logits, loss = criterion(x, y, labels)
+
+            if options['use_gpu']:
+                all_features.append(y.data.cpu().numpy())
+                all_labels.append(labels.data.cpu().numpy())
+            else:
+                all_features.append(y.data.numpy())
+                all_labels.append(labels.data.numpy())
 
             loss.backward()
             optimizer.step()
@@ -31,6 +39,10 @@ def train(net, criterion, optimizer, trainloader, epoch=None, **options):
 
         loss_all += losses.avg
 
+    all_features = np.concatenate(all_features, 0)
+    all_labels = np.concatenate(all_labels, 0)
+    plot_features(all_features, all_labels, options['num_classes'], epoch, prefix='arpl',
+                  legends=trainloader.dataset.get_labels_name())
     return loss_all
 
 

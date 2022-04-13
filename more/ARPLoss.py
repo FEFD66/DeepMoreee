@@ -7,7 +7,7 @@ class ARPLoss(nn.CrossEntropyLoss):
     def __init__(self, **options):
         super(ARPLoss, self).__init__()
         self.use_gpu = options['use_gpu']
-        self.weight_pl = weight_pl
+        self.weight_pl = 0.1
         self.temp = 1  # 不知道做什么的
         self.Dist = Dist(num_classes=options['num_classes'], feat_dim=options['feat_dim'])
         self.points = self.Dist.centers
