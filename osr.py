@@ -4,7 +4,7 @@ import time
 
 import torch.nn
 from more.datasets import load_more_data, load_data_mnist
-from more.network import ARPLNet, init_weights
+from more.network import ARPLNet, init_weights, MoreNet
 import more.train as T
 from more.ARPLoss import ARPLoss
 import os
@@ -46,10 +46,9 @@ train_loader, test_loader = load_more_data(options['data_dir'], options['batch_s
 options['classes_legends'] = train_loader.dataset.get_labels_name()
 options['num_classes'] = len(options['classes_legends'])
 
-net = ARPLNet()
-options['feat_dim'] = 128
+net = ARPLNet(2, 8)
+options['feat_dim'] = 2
 criterion = ARPLoss(**options)
-
 
 if use_gpu:
     net = torch.nn.DataParallel(net).cuda()

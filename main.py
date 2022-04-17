@@ -2,6 +2,8 @@ import d2l.torch
 from torch.utils.data import Dataset
 import torch
 import torch.nn as nn
+
+from more import train
 from more.datasets import ModulationDataSets, load_data_mnist
 from more.network import MoreNet, init_weights
 from more.train import train_center
@@ -30,7 +32,7 @@ test_loader = torch.utils.data.DataLoader(
 # train_loader, test_loader = load_data_mnist(128, (196, 64))
 # %%
 net = MoreNet()
-X = torch.rand(size=(1, 1, 196, 64), dtype=torch.float32)
+X = torch.rand(size=(1, 1, 195, 64), dtype=torch.float32)
 net(X, True)
 # %%
 # net.load_state_dict(torch.load('basic-8.parm'))
@@ -52,19 +54,7 @@ scheduler = torch.optim.lr_scheduler.StepLR(opt_model, step_size=20, gamma=0.5)
 net = net.to("cuda:0")
 # %%
 start_time = time.time()
-
-max_epoch = 150
-for epoch in range(max_epoch):
-    print("==> Epoch {}/{}".format(epoch + 1, max_epoch))
-
-    train_center(net, loss, center_loss, opt_model, opt_center, train_loader, True, num_classes, epoch)
-    scheduler.step()
-    if (epoch + 1) % 10 == 0 or (epoch + 1) == max_epoch:
-        torch.save(net.state_dict(), get_out_path() + "/parm/new-{:03}.parm".format(epoch))
-    #     print("==> Test")
-    #     acc, err = test(model, testloader, use_gpu, dataset.num_classes, epoch)
-    #     print("Accuracy (%): {}\t Error rate (%): {}".format(acc, err))
-
+train.train_ch6(net,train_loader,test_loader,150,0.01,"cuda:0")
 elapsed = round(time.time() - start_time)
 elapsed = str(datetime.timedelta(seconds=elapsed))
 print("Finished. Total elapsed time (h:m:s): {}".format(elapsed))

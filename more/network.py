@@ -2,14 +2,13 @@ import torch.nn.functional as F
 import torch.nn as nn
 
 
-def old_conv():
+def old_conv(feat_dim):
     return nn.Sequential(
         nn.Conv2d(1, 10, kernel_size=5), nn.MaxPool2d(2), nn.ReLU(),
         nn.Conv2d(10, 20, kernel_size=5), nn.Dropout2d(0.2), nn.MaxPool2d(2), nn.ReLU(),
         nn.Flatten(),
-        nn.Linear(11960, 4096), nn.ReLU(),
-        nn.Linear(4096, 128), nn.ReLU(),
-        nn.Dropout(0),
+        nn.Linear(11700, 4096), nn.ReLU(),
+        nn.Linear(4096, feat_dim), nn.ReLU()
     )
 
 
@@ -44,26 +43,25 @@ def new_net():
 class MoreNet(nn.Module):
     def __init__(self):
         super().__init__()
-        self.conv = old_conv()
-        self.fc_feat = nn.Linear(128, 2)
-
-        self.fc8 = nn.Linear(2, 8)
+        self.conv = old_conv(128)
+        # self.fc_feat = nn.Linear(128, 2)
+        self.fc8 = nn.Linear(128, 8)
 
     def forward(self, x, return_feature=False):
         x = self.conv(x)
-        x = self.fc_feat(x)
+        # x = self.fc_feat(x)
         y = self.fc8(x)
         if return_feature:
-            return x.detach(),y
+            return x.detach(), F.softmax(y)
         else:
-            return y
+            return F.softmax(y)
 
 
 class ARPLNet(nn.Module):
-    def __init__(self):
+    def __init__(self, feat_dim, num_classes):
         super().__init__()
-        self.conv = old_conv()
-        self.fc = nn.Linear(128, 2, bias=False)
+        self.conv = old_conv(feat_dim)
+        self.fc = nn.Linear(feat_dim, num_classes, bias=False)
 
     def forward(self, x, return_feature=False):
         x = self.conv(x)

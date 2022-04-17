@@ -22,7 +22,7 @@ class ModulationDataSets(Dataset):
 
         self.toTenser = ToTensor()
         if not lazy:
-            self.img = self.toTenser(self.h5['sampleData'][:]).float().reshape(-1, 1, 196, 64)
+            self.img = self.toTenser(self.h5['sampleData'][:]).float().reshape(-1, 1, 195, 64)
         else:
             self.img = self.h5['sampleData']
 
