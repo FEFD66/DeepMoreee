@@ -9,6 +9,8 @@ import more.train as T
 from more.ARPLoss import ARPLoss
 import os
 
+from more.test import test
+
 os.environ["KMP_DUPLICATE_LIB_OK"] = "TRUE"
 
 parser = argparse.ArgumentParser()
@@ -46,8 +48,9 @@ train_loader, test_loader = load_more_data(options['data_dir'], options['batch_s
 options['classes_legends'] = train_loader.dataset.get_labels_name()
 options['num_classes'] = len(options['classes_legends'])
 
-net = ARPLNet(2, 8)
-options['feat_dim'] = 2
+feat_dim=2
+net = ARPLNet(feat_dim, 8)
+options['feat_dim'] =feat_dim
 criterion = ARPLoss(**options)
 
 if use_gpu:
@@ -75,9 +78,9 @@ for epoch in range(options['max_epoch']):
         print("Test(应该是，但还没实现)")
         torch.save(net.state_dict(), options["save_dir"] + "/parm/net-myarpl.parm")
         torch.save(criterion.state_dict(), options["save_dir"] + "/parm/crit-myarpl.parm")
-        # print("==> Test", options['loss'])
-        # results = test(net, criterion, testloader, outloader, epoch=epoch, **options)
-        # print("Acc (%): {:.3f}\t AUROC (%): {:.3f}\t OSCR (%): {:.3f}\t".format(results['ACC'], results['AUROC'],
+        print("==> Test", options['loss'])
+        results = test(net, criterion, test_loader, outloader, epoch=epoch, **options)
+        print("Acc (%): {:.3f}\t AUROC (%): {:.3f}\t OSCR (%): {:.3f}\t".format(results['ACC'], results['AUROC'],
 
 elapsed = round(time.time() - start_time)
 elapsed = str(datetime.timedelta(seconds=elapsed))

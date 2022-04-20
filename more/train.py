@@ -6,6 +6,7 @@ from utils.plot import plot_features
 import numpy as np
 from d2l import torch as d2l
 
+
 def train(net, criterion, optimizer, trainloader, epoch=None, **options):
     net.train()
     losses = AverageMeter()
@@ -43,7 +44,7 @@ def train(net, criterion, optimizer, trainloader, epoch=None, **options):
     all_features = np.concatenate(all_features, 0)
     all_labels = np.concatenate(all_labels, 0)
     plot_features(all_features, all_labels, options['num_classes'], epoch, prefix='arpl',
-                  legends=trainloader.dataset.get_labels_name())
+                  points=criterion.points.data.cpu().numpy(), legends=trainloader.dataset.get_labels_name())
     return loss_all
 
 
@@ -97,6 +98,7 @@ def train_center(model, criterion_xent, criterion_cent,
     all_labels = np.concatenate(all_labels, 0)
     plot_features(all_features, all_labels, num_classes, epoch, prefix='more-new',
                   legends=trainloader.dataset.get_labels_name())
+
 
 def train_ch6(net, train_iter, test_iter, num_epochs, lr, device):
     """Train a model with a GPU (defined in Chapter 6).

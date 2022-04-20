@@ -8,7 +8,7 @@ def old_conv(feat_dim):
         nn.Conv2d(10, 20, kernel_size=5), nn.Dropout2d(0.2), nn.MaxPool2d(2), nn.ReLU(),
         nn.Flatten(),
         nn.Linear(11700, 4096), nn.ReLU(),
-        nn.Linear(4096, feat_dim), nn.ReLU()
+        nn.Linear(4096, feat_dim)
     )
 
 
@@ -65,7 +65,7 @@ class ARPLNet(nn.Module):
 
     def forward(self, x, return_feature=False):
         x = self.conv(x)
-        y = self.fc(x)
+        y = self.fc(F.relu(x))
         if return_feature:
             return x, y
         else:
