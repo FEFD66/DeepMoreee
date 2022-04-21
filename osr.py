@@ -1,9 +1,9 @@
 import argparse
-import datetime
 import time
+import datetime
 
 import torch.nn
-from more.datasets import load_more_data, load_data_mnist
+from more.datasets import load_more_data, load_data_mnist, load_osr_data
 from more.network import ARPLNet, init_weights, MoreNet
 import more.train as T
 from more.ARPLoss import ARPLoss
@@ -44,23 +44,28 @@ options.update({
     'use_gpu': use_gpu
 })
 
-train_loader, test_loader = load_more_data(options['data_dir'], options['batch_size'])
+# train_loader, test_loader = load_more_data(options['data_dir'], options['batch_size'])
+options['name'] = "osr24507"
+known = [2, 4, 5, 0, 7]
+unknown = list(set(list(range(0, 8))) - set(known))
+train_loader, test_loader, outloader = load_osr_data(options['data_dir'], known=known, unknown=unknown,
+                                                     batch_size=options['batch_size'])
 options['classes_legends'] = train_loader.dataset.get_labels_name()
-options['num_classes'] = len(options['classes_legends'])
+options['num_classes'] = len(known)
 
-feat_dim=2
-net = ARPLNet(feat_dim, 8)
-options['feat_dim'] =feat_dim
+feat_dim = 2
+net = ARPLNet(feat_dim, options['num_classes'])
+options['feat_dim'] = feat_dim
 criterion = ARPLoss(**options)
 
 if use_gpu:
     net = torch.nn.DataParallel(net).cuda()
     criterion = criterion.cuda()
 
-if os.path.exists(options["save_dir"] + "/parm/net-myarpl.parm"):
+if os.path.exists(options["save_dir"] + "/parm/net-"+options['name']+".parm"):
     print("Load exist parameter")
-    net.load_state_dict(torch.load(options["save_dir"] + "/parm/net-myarpl.parm"))
-    criterion.load_state_dict(torch.load(options["save_dir"] + "/parm/crit-myarpl.parm"))
+    net.load_state_dict(torch.load(options["save_dir"] + "/parm/net-"+options['name']+".parm"))
+    criterion.load_state_dict(torch.load(options["save_dir"] + "/parm/crit-"+options['name']+".parm"))
 else:
     print("Init Parameter RANDOM")
     init_weights(net)
@@ -81,6 +86,7 @@ for epoch in range(options['max_epoch']):
         print("==> Test", options['loss'])
         results = test(net, criterion, test_loader, outloader, epoch=epoch, **options)
         print("Acc (%): {:.3f}\t AUROC (%): {:.3f}\t OSCR (%): {:.3f}\t".format(results['ACC'], results['AUROC'],
+                                                                                results['OSCR']))
 
 elapsed = round(time.time() - start_time)
 elapsed = str(datetime.timedelta(seconds=elapsed))

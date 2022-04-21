@@ -1,7 +1,7 @@
 import numpy as np
 
 import torch
-import evaluation
+import more.evaluation as evaluation
 
 
 def test(net, criterion, testloader, outloader, epoch=None, use_gpu: bool = True):

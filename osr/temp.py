@@ -7,7 +7,6 @@ from torch.optim import lr_scheduler
 
 from core import train, test
 from datasets.osr_dataloader import MNIST_OSR
-from models import gan
 from models.models import classifier32
 from osr.utils import save_networks, load_networks
 
