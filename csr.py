@@ -54,7 +54,6 @@ net = nn.Sequential(
     nn.Linear(512, 8),
     nn.Softmax(dim=0)
 )
-init_weights(net)
 loss = nn.CrossEntropyLoss()
 center_loss = CenterLoss(num_classes=num_classes, feat_dim=2, use_gpu=True)
 lr = 0.001
@@ -65,6 +64,13 @@ opt_center = torch.optim.SGD(center_loss.parameters(), lr_center)
 scheduler = torch.optim.lr_scheduler.StepLR(opt_model, step_size=20, gamma=0.5)
 
 net = net.to("cuda:0")
+if os.path.exists('../mod.parm'):
+    print('using exits parm')
+    net.load_state_dict(torch.load('../mod.parm'))
+else:
+    print('using random parm')
+    init_weights(net)
+
 start_time = time.time()
 
 
@@ -99,6 +105,8 @@ def train_ch6(net, train_iter, test_iter, num_epochs, lr, device):
               f'test acc {test_acc:.3f}')
         print(f'{metric[2] * num_epochs / timer.sum():.1f} examples/sec '
               f'on {str(device)}')
+        if epoch % 10 == 0:
+            torch.save(net.state_dict(),'../mod.parm')
 
 train_ch6(net, train_loader, test_loader, 150, 0.01, "cuda:0")
 elapsed = round(time.time() - start_time)
