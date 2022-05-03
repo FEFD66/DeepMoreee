@@ -6,40 +6,44 @@ from torch.utils.data import DataLoader
 from torchvision.transforms import ToTensor, transforms
 import numpy as np
 
+glabels = ['singlepulse', 'freqdiv', 'LFM', 'QFM', '2FSK', '4FSK', 'BPSK', 'QPSK']
+
 
 class ModulationDataSets(Dataset):
     __lazy: bool = False
     __PSK: bool = True
-    labels = ['singlepulse', 'freqdiv', 'LFM', 'QFM', '2FSK', '4FSK', 'BPSK', 'QPSK']
 
     def __init__(self, file, type_select=None):
         self.h5 = h5py.File(file, "r")
-        self.label_id = self.h5['sampleType'][:]
+        self.types = self.h5['sampleType'][0, :]
         self.type_select = type_select
         self.length = 0
-        _, self.length = self.label_id.shape
+        self.labels = []
 
         self.toTenser = ToTensor()
         self.img = self.h5['sampleData'][:]
-        mask = self.type_filter(type_select)
         if type_select is not None:
+            mask = self.type_filter(type_select)
             self.img = self.img[:, :, mask]
-        self.img = self.toTenser(self.img)
-        self.label_id = torch.tensor(self.label_id[:, mask], dtype=torch.long)
+            self.types = self.types[mask]
+            for idx, id in enumerate(type_select):
+                self.types[self.types == id] = idx
+                self.labels.append(glabels[id-1])
+        self.types = torch.tensor(self.types, dtype=torch.long)
+        self.length = self.types.shape
 
     def type_filter(self, types):
-        full = (self.label_id[0, :] is None)
+        full = (self.types[:] is None)
         for i in types:
-            full = full | (self.label_id[0, :] == i)
+            full = full | (self.types[:] == i)
         ids = np.argwhere(full).reshape(-1)
         return ids
 
     def __getitem__(self, idx):
-        img = self.img[idx, :, :]  # if not self.__lazy else self.toTenser(self.img[:, :, idx]).float()
-        return img, self.label_id[0, idx] - 1
+        return self.toTenser(self.img[:, :, idx]).float(), self.types[idx]
 
     def __len__(self):
-        return self.length
+        return self.types.shape[0]
 
     def __exit__(self, exc_type, exc_val, exc_tb):
         self.h5.close()
@@ -48,7 +52,7 @@ class ModulationDataSets(Dataset):
         return self.labels
 
     def get_numclasses(self):
-        return len(self.labels[self.type_select])
+        return 8 if self.type_select is None else len(self.type_select)
 
 
 def load_more_data(path: str, batch_size: int = 64) -> (DataLoader, DataLoader):
