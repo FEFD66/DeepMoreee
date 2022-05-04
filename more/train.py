@@ -43,7 +43,7 @@ def train(net, criterion, optimizer, trainloader, epoch=None, **options):
 
     all_features = np.concatenate(all_features, 0)
     all_labels = np.concatenate(all_labels, 0)
-    plot_features(all_features, all_labels, options['num_classes'], epoch, prefix='arpl',
+    plot_features(all_features, all_labels, options['num_classes'], epoch, prefix=options['name'],
                   points=criterion.points.data.cpu().numpy(), legends=trainloader.dataset.get_labels_name())
     return loss_all
 

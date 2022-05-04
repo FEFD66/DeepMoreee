@@ -39,5 +39,7 @@ def plot_features(features, labels, num_classes, epoch, prefix, points=None, leg
     if not osp.exists(dirname):
         os.mkdir(dirname)
     save_name = osp.join(dirname, 'epoch_{:03}.png'.format(epoch + 1))
+    plt.xlim((-5, 5))
+    plt.ylim((-5, 5))
     plt.savefig(save_name, bbox_inches='tight')
     plt.close()

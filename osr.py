@@ -1,4 +1,4 @@
-#%%
+# %%
 import argparse
 import time
 import datetime
@@ -13,7 +13,7 @@ import os
 from more.test import test
 
 os.environ["KMP_DUPLICATE_LIB_OK"] = "TRUE"
-#%%
+# %%
 parser = argparse.ArgumentParser()
 
 # File path
@@ -29,7 +29,7 @@ parser.add_argument('--cpu', action='store_true')
 parser.add_argument('--lr', type=float, default=0.05)
 parser.add_argument("--mode")
 parser.add_argument("--port")
-parser.add_argument("--eval",default=False,action='store_true')
+parser.add_argument("--eval", default=False, action='store_true')
 # parser.add_argument('--gpu', type=str, default='0')
 
 args = parser.parse_args()
@@ -49,19 +49,20 @@ options.update({
 })
 
 # train_loader, test_loader = load_more_data(options['data_dir'], options['batch_size'])
-options['name'] = "osr24507"
-known = [3, 5, 6, 1, 8]
+
+known = [1, 2, 3, 5, 6, 7]
+options['name'] = "osr" + ''.join(str(i) for i in known)
 unknown = list(set(list(range(1, 9))) - set(known))
-#%%
+# %%
 train_loader, test_loader, outloader = load_osr_data(options['data_dir'], known=known, unknown=unknown,
                                                      batch_size=options['batch_size'])
 options['classes_legends'] = train_loader.dataset.get_labels_name()
 options['num_classes'] = len(known)
-#%%
+# %%
 feat_dim = 2
 net = ARPLNet(feat_dim, options['num_classes'])
 options['feat_dim'] = feat_dim
-options['loss']="ARPLoss"
+options['loss'] = "ARPLoss"
 criterion = ARPLoss(**options)
 
 if use_gpu:
@@ -94,7 +95,7 @@ for epoch in range(options['max_epoch']):
         torch.save(net.state_dict(), options["save_dir"] + "/parm/net-" + options['name'] + ".parm")
         torch.save(criterion.state_dict(), options["save_dir"] + "/parm/crit-" + options['name'] + ".parm")
         print("==> Test", options['loss'])
-        results = test(net, criterion, test_loader, outloader, epoch=epoch,use_gpu=options["use_gpu"])
+        results = test(net, criterion, test_loader, outloader, epoch=epoch, use_gpu=options["use_gpu"])
         print("Acc (%): {:.3f}\t AUROC (%): {:.3f}\t OSCR (%): {:.3f}\t".format(results['ACC'], results['AUROC'],
                                                                                 results['OSCR']))
 
