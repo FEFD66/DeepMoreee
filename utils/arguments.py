@@ -11,6 +11,7 @@ def getCmdArgs(fakearg=False) -> dict[str, any]:
     # File path
     parser.add_argument('--save-dir', type=str, default='E:/more')
     parser.add_argument('--data-dir', type=str, default='E:')
+    parser.add_argument('--log-dir', type=str, default='E:/log')
 
     # train
     parser.add_argument('--max-epoch', type=int, default=100)

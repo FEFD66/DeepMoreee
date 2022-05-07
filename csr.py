@@ -9,9 +9,13 @@ import utils.plot
 from more.datasets import load_more_data
 from more.network import MoreNet
 from utils.centerloss import CenterLoss
+from torch.utils.tensorboard import SummaryWriter
 
 utils.plot.fixLiberror()
 options = utils.arguments.getCmdArgs()
+
+writer = SummaryWriter(options['log_dir'])
+
 options['num_classes'] = 8
 options['name'] = 'close'
 train_loader, test_loader = load_more_data(options['data_dir'], options['batch_size'])
@@ -33,11 +37,12 @@ utils.parm.init_net(net, options)
 if options['eval']:
     exit(0)
 
-more.train.train_center_dry(net,train_loader,options['use_gpu'], options['num_classes'],options['name'],-1)
+more.train.train_center_dry(net, train_loader, options['use_gpu'], options['num_classes'], options['name'], -1)
 for epoch in range(options['max_epoch']):
     print("==> Epoch {}/{}".format(epoch + 1, options['max_epoch']))
-    more.train.train_center(net, loss, criterion_cent, optimizer_model, optimizer_centloss, train_loader, options['use_gpu'], options['num_classes'],options['name'], epoch)
-    # more.train.train_ch6(net,train_loader,test_loader,50,0.01,"cuda:0")
+    # more.train.train_center(net, loss, criterion_cent, optimizer_model, optimizer_centloss, train_loader, options['use_gpu'], options['num_classes'],options['name'], epoch)
+    more.train.train_ch6(net, loss, optimizer_model, train_loader, test_loader, 50, "cuda:0", writer)
+
     scheduler.step()
     if epoch % options['eval_freq'] == 0:
         utils.parm.save_net(net, options)
