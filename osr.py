@@ -1,9 +1,11 @@
 #%%
-import argparse
 import time
 import datetime
 
 import torch.nn
+
+import utils.arguments
+import utils.plot
 from more.datasets import load_more_data, load_data_mnist, load_osr_data
 from more.network import ARPLNet, init_weights, MoreNet
 import more.train as T
@@ -12,29 +14,9 @@ import os
 
 from more.test import test
 
-os.environ["KMP_DUPLICATE_LIB_OK"] = "TRUE"
+utils.plot.fixLiberror()
 #%%
-parser = argparse.ArgumentParser()
-
-# File path
-parser.add_argument('--save-dir', type=str, default='E:/more')
-parser.add_argument('--data-dir', type=str, default='E:')
-
-# train
-parser.add_argument('--max-epoch', type=int, default=100)
-parser.add_argument('--batch-size', type=int, default=64)
-parser.add_argument('--eval-freq', type=int, default=1)
-parser.add_argument('--print-freq', type=int, default=50)
-parser.add_argument('--cpu', action='store_true')
-parser.add_argument('--lr', type=float, default=0.05)
-parser.add_argument("--mode")
-parser.add_argument("--port")
-parser.add_argument("--eval",default=False,action='store_true')
-# parser.add_argument('--gpu', type=str, default='0')
-
-args = parser.parse_args()
-
-options: dict = vars(args)
+options = utils.arguments.getCmdArgs()
 
 use_gpu = torch.cuda.is_available()
 if options['cpu']:

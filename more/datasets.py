@@ -28,7 +28,10 @@ class ModulationDataSets(Dataset):
             self.types = self.types[mask]
             for idx, id in enumerate(type_select):
                 self.types[self.types == id] = idx
-                self.labels.append(glabels[id-1])
+                self.labels.append(glabels[id - 1])
+        else:
+            self.labels = glabels
+            self.types = self.types - 1
         self.types = torch.tensor(self.types, dtype=torch.long)
         self.length = self.types.shape
 

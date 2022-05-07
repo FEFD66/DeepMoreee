@@ -43,18 +43,19 @@ def new_net():
 class MoreNet(nn.Module):
     def __init__(self):
         super().__init__()
-        self.conv = old_conv(128)
+        self.conv = old_conv(2)
         # self.fc_feat = nn.Linear(128, 2)
-        self.fc8 = nn.Linear(128, 8)
+        self.fc8 = nn.Linear(2, 8)
 
     def forward(self, x, return_feature=False):
         x = self.conv(x)
         # x = self.fc_feat(x)
         y = self.fc8(x)
         if return_feature:
-            return x.detach(), F.softmax(y)
+            # return x, F.softmax(y, dim=0)
+            return x,y
         else:
-            return F.softmax(y)
+            return F.softmax(y, dim=0)
 
 
 class ARPLNet(nn.Module):

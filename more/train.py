@@ -50,7 +50,7 @@ def train(net, criterion, optimizer, trainloader, epoch=None, **options):
 
 def train_center(model, criterion_xent, criterion_cent,
                  optimizer_model, optimizer_centloss,
-                 trainloader, use_gpu, num_classes, epoch):
+                 trainloader, use_gpu, num_classes,name, epoch):
     weight_cent = 1
     print_freq = 50
 
@@ -96,7 +96,7 @@ def train_center(model, criterion_xent, criterion_cent,
     # end of batch loop
     all_features = np.concatenate(all_features, 0)
     all_labels = np.concatenate(all_labels, 0)
-    plot_features(all_features, all_labels, num_classes, epoch, prefix='more-new',
+    plot_features(all_features, all_labels, num_classes, epoch, prefix=name,
                   legends=trainloader.dataset.get_labels_name())
 
 

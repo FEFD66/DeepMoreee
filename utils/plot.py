@@ -1,7 +1,12 @@
 import matplotlib.pyplot as plt
 from utils import get_out_path
 import os.path as osp
+import numpy as np
 import os
+
+
+def fixLiberror():
+    os.environ["KMP_DUPLICATE_LIB_OK"] = "TRUE"
 
 
 def plot_features(features, labels, num_classes, epoch, prefix, points=None, legends=None):
@@ -28,13 +33,16 @@ def plot_features(features, labels, num_classes, epoch, prefix, points=None, leg
 
     if points is not None:
         for i in range(num_classes):
-                plt.scatter(points[i, 0],
-                            points[i, 1],
-                            c=colors[i],
-                            s=25,
-                            marker='^',
-                            edgecolors="#000000"
-                            )
+            plt.scatter(points[i, 0],
+                        points[i, 1],
+                        c=colors[i],
+                        s=25,
+                        marker='^',
+                        edgecolors="#000000"
+                        )
+    x_max, y_max = features.max(0)
+    plt.xlim((-x_max, x_max))
+    plt.ylim((-y_max, y_max))
     dirname = get_out_path() + "/pic/" + prefix
     if not osp.exists(dirname):
         os.mkdir(dirname)
