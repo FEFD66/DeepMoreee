@@ -33,7 +33,7 @@ def init_parm(net, prefix: str, options: dict):
         print("Load exist parameter for " + prefix)
         net.load_state_dict(torch.load(file))
     else:
-        print("Init" + prefix + " Parameter RANDOM")
+        print("Init " + prefix + " Parameter RANDOM")
         init_weights(net)
 
 

@@ -41,9 +41,17 @@ def plot_features(features, labels, num_classes, epoch, prefix, points=None, leg
                         edgecolors="#000000"
                         )
     x_max, y_max = features.max(0)
+    x_min, y_min = features.min(0)
+    if x_max<-x_min:
+        x_max=-x_min
+    if y_max<-y_min:
+        y_max=-y_min
     plt.xlim((-x_max, x_max))
     plt.ylim((-y_max, y_max))
-    dirname = get_out_path() + "/pic/" + prefix
+    dirname = get_out_path() + "/pic/"
+    if not osp.exists(dirname):
+        os.mkdir(dirname)
+    dirname=dirname+ prefix
     if not osp.exists(dirname):
         os.mkdir(dirname)
     save_name = osp.join(dirname, 'epoch_{:03}.png'.format(epoch + 1))
