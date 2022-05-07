@@ -3,7 +3,7 @@ import argparse
 import torch
 
 
-def getCmdArgs(fakearg=False) -> dict[str, any]:
+def getCmdArgs(fakearg=False) :
     if fakearg:
         return getDefaultArgs()
     parser = argparse.ArgumentParser()
